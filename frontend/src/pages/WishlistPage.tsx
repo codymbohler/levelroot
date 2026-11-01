@@ -20,7 +20,7 @@ export default function WishlistPage() {
           slug: l.game_slug,
           title: l.game_title,
           cover: l.game_cover,
-          release_date: null, // We don't have this in the logs API, but it's fine
+          release_date: null,
         }));
         setGames(mapped);
       })

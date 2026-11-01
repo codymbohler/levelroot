@@ -95,7 +95,7 @@ function HomePage() {
                       {log.game_title}
                     </Link>
 
-                    {/* THE UPDATED BADGE */}
+                    {/* BADGE */}
                     <span
                       className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-sm ${
                         log.is_beat ? 'text-black' : 'bg-accent-green text-white'

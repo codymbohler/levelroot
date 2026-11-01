@@ -45,7 +45,7 @@ export default function ReviewListCard({ log, hideGame = false }: { log: UserLog
             </Link>
           )}
 
-          {/* THE UPDATED BADGE */}
+          {/* BADGE */}
           <span
             className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-sm ml-2 ${
               log.is_beat ? 'text-black' : 'bg-accent-green text-white'

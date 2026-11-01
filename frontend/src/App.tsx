@@ -20,12 +20,9 @@ function Header() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
   const [search, setSearch] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  
   const searchInputRef = useRef<HTMLInputElement>(null);
-
   const isGamePage = location.pathname.startsWith('/games/') && location.pathname !== '/games';
 
   useEffect(() => {
@@ -68,13 +65,14 @@ function Header() {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:rotate-180"><path d="m6 9 6 6 6-6"/></svg>
             </button>
 
-            {/* Dropdown Menu - Opens on Hover */}
+            {/* Dropdown Menu */}
             <div className="absolute right-0 mt-2 w-48 bg-surface border border-hairline rounded-lg shadow-xl overflow-hidden py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
               <Link to="/" className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Home</Link>
               <Link to={`/user/${user.username}`} className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Profile</Link>
               <Link to={`/user/${user.username}/games`} className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Games</Link>
               <Link to={`/user/${user.username}/reviews`} className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Reviews</Link>
-              <Link to={`/user/${user.username}/wishlist`} className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Want to Play</Link> {/* <-- Changed here */}             <Link to="/settings" className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Settings</Link>
+              <Link to={`/user/${user.username}/wishlist`} className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Want to Play</Link>
+			  <Link to="/settings" className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Settings</Link>
               <div className="h-px bg-hairline my-1" />
 			  {user?.is_admin && (
 				<Link to="/admin" className="block px-4 py-2 hover:bg-surface-hover text-ps-blue text-sm font-bold">Admin Panel</Link>
@@ -142,12 +140,10 @@ function App() {
                 <Route path="/user/:username" element={<UserPage />} />
                 <Route path="/user/:username/followers" element={<FollowersPage mode="followers" />} />
                 <Route path="/user/:username/following" element={<FollowersPage mode="following" />} />
-                
                 <Route path="/user/:username/games" element={<UserGamesPage />} />
                 <Route path="/user/:username/reviews" element={<UserReviewsPage />} />
                 <Route path="/user/:username/wishlist" element={<WishlistPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-                
                 <Route path="/search" element={<SearchPage />} />
 				<Route path="/admin" element={<AdminPage />} />
               </Routes>

@@ -7,10 +7,10 @@
   --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
 
   /* New Accents (Green & Gold Theme) */
-  --color-accent-green: #00b849; /* Xbox-style green for 'Beat it' */
+  --color-accent-green: #00b849; /* green for Beat it */
   --color-accent-green-hover: #009e3e;
   
-  --color-accent-gold: #d4af37; /* Achievement gold for '100% Completed' and stars */
+  --color-accent-gold: #d4af37; /* gold for 100% Completed and stars */
   --color-accent-gold-hover: #b8952b;
 
   /* Surfaces */
