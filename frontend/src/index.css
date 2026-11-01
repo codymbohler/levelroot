@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+
+  /* New Accents (Green & Gold Theme) */
+  --color-accent-green: #00b849; /* Xbox-style green for 'Beat it' */
+  --color-accent-green-hover: #009e3e;
+  
+  --color-accent-gold: #d4af37; /* Achievement gold for '100% Completed' and stars */
+  --color-accent-gold-hover: #b8952b;
+
+  /* Surfaces */
+  --color-canvas: #121212;
+  --color-surface: #1a1a1a;
+  --color-surface-hover: #242424;
+  --color-charcoal: #2a2a2a;
+
+  /* Text */
+  --color-ink: #ededed;
+  --color-ink-muted: #a0a0a0;
+
+  /* Borders */
+  --color-hairline: rgba(255, 255, 255, 0.08);
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* Base styles */
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* Custom scrollbar to match the dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-charcoal);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-muted);
+}
