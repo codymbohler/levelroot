@@ -10,6 +10,7 @@ export type User = {
   display_name: string | null;
   bio: string | null;
   avatar: string | null;
+  banner_image: string | null;
   is_admin: boolean;
   created_at: string;
 };

@@ -6,7 +6,7 @@ const router = Router();
 
 router.put('/api/users/me', requireAuth, async (req: AuthedRequest, res) => {
   try {
-    const { displayName, bio, avatar } = req.body;
+    const { displayName, bio, avatar, bannerImage } = req.body;
 
     if (displayName !== undefined && displayName !== null) {
       if (typeof displayName !== 'string' || displayName.length > 50) {
@@ -31,15 +31,17 @@ router.put('/api/users/me', requireAuth, async (req: AuthedRequest, res) => {
          display_name = $1,
          bio = $2,
          avatar = $3,
+		 banner_image = $4,
          updated_at = NOW()
-       WHERE id = $4
-       RETURNING id, username, display_name, bio, avatar, created_at,
+       WHERE id = $5
+       RETURNING id, username, display_name, bio, avatar, banner_image, created_at,
                  (SELECT COUNT(*)::int FROM follows WHERE following_id = users.id) AS follower_count,
                  (SELECT COUNT(*)::int FROM follows WHERE follower_id = users.id) AS following_count`,
       [
         displayName?.trim() || null,
         bio?.trim() || null,
         avatar?.trim() || null,
+		bannerImage?.trim() || null,
         req.userId,
       ]
     );

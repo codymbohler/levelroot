@@ -93,7 +93,7 @@ router.post('/api/auth/login', async (req, res) => {
 router.get('/api/auth/me', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, email, username, display_name, bio, avatar, is_admin, created_at FROM users WHERE id = $1 LIMIT 1',
+      'SELECT id, email, username, display_name, bio, avatar, banner_image, is_admin, created_at FROM users WHERE id = $1 LIMIT 1',
       [req.userId]
     );
 

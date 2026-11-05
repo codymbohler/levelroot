@@ -100,6 +100,7 @@ export type UserProfile = {
   display_name: string | null;
   bio: string | null;
   avatar: string | null;
+  banner_image: string | null;
   created_at: string;
   follower_count: number;
   following_count: number;
@@ -291,6 +292,7 @@ export type UpdateProfileInput = {
   displayName?: string | null;
   bio?: string | null;
   avatar?: string | null;
+  bannerImage?: string | null;
 };
 
 export async function updateProfile(

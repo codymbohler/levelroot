@@ -13,6 +13,7 @@ import type { UserProfile, UserLog, Favorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import FavoritesModal from '../components/FavoritesModal';
 import LogModal from '../components/LogModal';
+import ReviewListCard from '../components/ReviewListCard';
 
 function UserPage() {
   const { username } = useParams<{ username: string }>();
@@ -85,18 +86,8 @@ function UserPage() {
     }
   }
 
-  if (loading) {
-    return <main className="px-8 py-12 text-ink-muted">Loading…</main>;
-  }
-
-  if (error || !user) {
-    return (
-      <main className="px-8 py-12">
-        <Link to="/" className="text-accent-green hover:underline text-sm">← Back</Link>
-        <p className="text-red-400 mt-4">{error || 'User not found'}</p>
-      </main>
-    );
-  }
+  if (loading) return <main className="px-8 py-12 text-ink-muted">Loading…</main>;
+  if (error || !user) return <main className="px-8 py-12"><p className="text-red-400">{error || 'User not found'}</p></main>;
 
   const memberSince = new Date(user.created_at).toLocaleDateString(undefined, {
     year: 'numeric',
@@ -105,81 +96,97 @@ function UserPage() {
 
   const isOwnProfile = me?.id === user.id;
 
+  // Pick the banner: User's custom banner -> First favorite game cover -> null
+  const bannerImage = user.banner_image || (favorites.length > 0 ? favorites[0].cover : null);
+
   return (
-    <main>
-      {/* Profile header */}
-      <div className="px-8 py-12 border-b border-hairline">
-        <div className="flex items-center gap-6">
-          <div className="w-24 h-24 rounded-full bg-charcoal overflow-hidden shrink-0 border-2 border-hairline">
-            {user.avatar ? (
-              <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-ink-muted text-3xl font-light">
-                {user.username[0]?.toUpperCase()}
+    <main className="pb-24">
+      {/* HERO BANNER */}
+      <div className="relative w-full h-[40vh] min-h-[300px] -mt-[88px]">
+        {bannerImage ? (
+          <>
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${bannerImage})` }} />
+            {/* Fades */}
+            <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-canvas/70 via-transparent to-canvas/70" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-surface" />
+        )}
+      </div>
+
+      {/* PROFILE HEADER OVERLAY */}
+      <div className="relative z-20 px-8 max-w-5xl mx-auto -mt-32">
+        <div className="flex items-end justify-between gap-6">
+          
+          {/* Avatar and Info */}
+          <div className="flex items-end gap-6">
+            <div className="w-32 h-32 rounded-full bg-charcoal overflow-hidden shrink-0 border-4 border-canvas shadow-2xl">
+              {user.avatar ? (
+                <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-ink-muted text-5xl font-light">
+                  {user.username[0]?.toUpperCase()}
+                </div>
+              )}
+            </div>
+
+            <div className="pb-2">
+              <h1 className="text-4xl font-display font-medium tracking-tight text-white drop-shadow-md">
+                {user.display_name || user.username}
+              </h1>
+              <p className="text-ink-muted mt-1 text-sm font-medium">@{user.username}</p>
+              
+              <div className="flex gap-6 mt-4 text-sm">
+                <Link to={`/user/${user.username}/followers`} className="hover:text-accent-green transition-colors">
+                  <span className="text-xl font-display font-medium text-white">{user.follower_count}</span>
+                  <span className="text-ink-muted ml-1.5">
+                    {user.follower_count === 1 ? 'follower' : 'followers'}
+                  </span>
+                </Link>
+                <Link to={`/user/${user.username}/following`} className="hover:text-accent-green transition-colors">
+                  <span className="text-xl font-display font-medium text-white">{user.following_count}</span>
+                  <span className="text-ink-muted ml-1.5">following</span>
+                </Link>
               </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="pb-2">
+            {me && me.id !== user.id && (
+              <button
+                onClick={toggleFollow}
+                disabled={followBusy}
+                className={`px-7 py-2.5 rounded-full font-bold text-sm tracking-wide transition-colors disabled:opacity-50 ${
+                  isFollowing
+                    ? 'border border-hairline text-ink-muted hover:text-ink bg-black/50 backdrop-blur'
+                    : 'bg-accent-green text-white hover:bg-accent-green-hover'
+                }`}
+              >
+                {followBusy ? '…' : isFollowing ? 'Following' : 'Follow'}
+              </button>
+            )}
+
+            {isOwnProfile && (
+              <Link
+                to="/settings"
+                className="px-7 py-2.5 rounded-full border border-hairline bg-black/50 backdrop-blur text-ink-muted font-bold text-sm tracking-wide hover:text-ink transition-colors inline-block"
+              >
+                Edit profile
+              </Link>
             )}
           </div>
-
-          <div className="flex-1">
-            <h1 className="text-4xl font-display font-medium tracking-tight">
-              {user.display_name || user.username}
-            </h1>
-            <p className="text-ink-muted mt-1 text-sm">@{user.username}</p>
-            <p className="text-ink-muted mt-2 text-xs">Member since {memberSince}</p>
-          </div>
-
-          {me && me.id !== user.id && (
-            <button
-              onClick={toggleFollow}
-              disabled={followBusy}
-              className={`px-7 py-3 rounded-full font-bold text-sm tracking-wide transition-colors disabled:opacity-50 ${
-                isFollowing
-                  ? 'border border-hairline text-ink-muted hover:text-ink'
-                  : 'bg-accent-green text-white hover:bg-accent-green-hover'
-              }`}
-            >
-              {followBusy ? '…' : isFollowing ? 'Following' : 'Follow'}
-            </button>
-          )}
-
-          {isOwnProfile && (
-            <Link
-              to="/settings"
-              className="px-7 py-3 rounded-full border border-hairline text-ink-muted font-bold text-sm tracking-wide hover:text-ink transition-colors"
-            >
-              Edit profile
-            </Link>
-          )}
         </div>
 
+        {/* Bio */}
         {user.bio && (
-          <p className="text-ink-muted mt-6 max-w-2xl leading-relaxed">{user.bio}</p>
+          <p className="text-ink-muted mt-6 max-w-2xl leading-relaxed text-sm">{user.bio}</p>
         )}
-
-        <div className="flex gap-8 mt-6 text-sm">
-          <div>
-            <span className="text-2xl font-display font-medium">{logs.length}</span>
-            <span className="text-ink-muted ml-2">logged</span>
-          </div>
-          <div>
-            <span className="text-2xl font-display font-medium">{favorites.length}</span>
-            <span className="text-ink-muted ml-2">favorites</span>
-          </div>
-          <Link to={`/user/${user.username}/followers`} className="hover:text-accent-green transition-colors">
-            <span className="text-2xl font-display font-medium">{user.follower_count}</span>
-            <span className="text-ink-muted ml-2">
-              {user.follower_count === 1 ? 'follower' : 'followers'}
-            </span>
-          </Link>
-          <Link to={`/user/${user.username}/following`} className="hover:text-accent-green transition-colors">
-            <span className="text-2xl font-display font-medium">{user.following_count}</span>
-            <span className="text-ink-muted ml-2">following</span>
-          </Link>
-        </div>
       </div>
 
       {/* 5 Favorites band */}
-      <div className="px-8 py-12 border-b border-hairline">
+      <div className="px-8 pt-12 pb-8 max-w-5xl mx-auto border-b border-hairline">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-display font-medium">
             Favorites {favorites.length > 0 && <span className="text-ink-muted">({favorites.length}/5)</span>}
@@ -187,7 +194,7 @@ function UserPage() {
           {isOwnProfile && (
             <button
               onClick={() => setShowFavModal(true)}
-              className="px-5 py-2 rounded-full bg-accent-green text-white text-sm font-bold tracking-wide hover:bg-accent-green-hover transition-colors"
+              className="px-5 py-2 rounded-full bg-surface border border-hairline text-white text-sm font-bold tracking-wide hover:bg-surface-hover transition-colors"
             >
               {favorites.length === 0 ? 'Pick favorites' : 'Edit favorites'}
             </button>
@@ -204,11 +211,18 @@ function UserPage() {
                 to={`/games/${fav.slug}`}
                 className="rounded-md overflow-hidden bg-surface border border-hairline group transition-transform hover:-translate-y-1 block"
               >
-                <div className="aspect-[3/4] overflow-hidden bg-charcoal">
+                <div className="aspect-[2/3] overflow-hidden bg-charcoal">
                   {fav.cover ? (
-                    <img src={fav.cover} alt={fav.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    <img
+                      src={fav.cover}
+                      alt={fav.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-ink-muted text-xs">no cover</div>
+                    <div className="w-full h-full flex items-center justify-center text-ink-muted text-xs">
+                      no cover
+                    </div>
                   )}
                 </div>
                 <div className="p-2">
@@ -221,78 +235,29 @@ function UserPage() {
       </div>
 
       {/* Activity feed */}
-      <div className="px-8 py-12">
+      <div className="px-8 py-12 max-w-5xl mx-auto">
         <h2 className="text-2xl font-display font-medium mb-6">
-          Activity {logs.length > 0 && <span className="text-ink-muted">({logs.length})</span>}
+          Recent Activity {logs.length > 0 && <span className="text-ink-muted">({logs.length})</span>}
         </h2>
 
         {logs.length === 0 ? (
           <p className="text-ink-muted text-sm">Nothing logged yet.</p>
         ) : (
-          <div className="space-y-6">
-            {logs.map((log) => {
-              return (
-                <article key={log.id} className="flex gap-6 pb-6 border-b border-hairline last:border-0">
-                  <Link to={`/games/${log.game_slug}`} className="w-20 shrink-0 self-start rounded-md overflow-hidden bg-charcoal block aspect-[3/4]">
-                    {log.game_cover ? (
-                      <img src={log.game_cover} alt={log.game_title} className="w-full h-full object-cover" loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-ink-muted text-[10px]">no cover</div>
-                    )}
-                  </Link>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <Link to={`/games/${log.game_slug}`} className="text-lg font-display font-medium hover:text-accent-green transition-colors">
-                        {log.game_title}
-                      </Link>
-
-                      {/* UPDATED BADGE */}
-                      <span
-                        className={`text-xs font-bold tracking-wide px-3 py-1 rounded-full ${
-                          log.is_beat ? 'text-black' : 'bg-accent-green text-white'
-                        }`}
-                        style={
-                          log.is_beat
-                            ? { background: 'linear-gradient(to right, #ffce21, #f5a623, #ee8e00)' }
-                            : undefined
-                        }
-                      >
-                        {log.is_beat ? 'Beat' : 'Played'}
-                      </span>
-
-                      {log.rating !== null && (
-                        <span className="text-accent-gold text-sm">
-                          {'★'.repeat(Math.floor(log.rating))}
-                          {log.rating % 1 >= 0.5 && '⯨'}
-                          <span className="text-ink-muted ml-2">{log.rating.toFixed(1)}</span>
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-3 mt-1 flex-wrap">
-                      <p className="text-xs text-ink-muted">
-                        {new Date(log.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                        {log.played_on && ` · played on ${log.played_on}`}
-                      </p>
-
-                      {isOwnProfile && (
-                        <div className="flex items-center gap-2 text-xs">
-                          <button onClick={() => setEditingLog(log)} className="text-ink-muted hover:text-accent-green transition-colors">Edit</button>
-                          <span className="text-ink-muted">·</span>
-                          <button onClick={() => handleDeleteLog(log.id)} disabled={deletingLogId === log.id} className="text-ink-muted hover:text-red-400 transition-colors disabled:opacity-50">
-                            {deletingLogId === log.id ? 'Deleting…' : 'Delete'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {log.quick_take && <p className="text-ink mt-3 font-medium">{log.quick_take}</p>}
-                    {log.review && <p className="text-ink-muted mt-2 leading-relaxed whitespace-pre-wrap">{log.review}</p>}
-                  </div>
-                </article>
-              );
-            })}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+            {logs.slice(0, 10).map((log) => (
+              <ReviewListCard key={log.id} log={log as any} />
+            ))}
+          </div>
+        )}
+        
+        {logs.length > 10 && (
+          <div className="mt-8 text-center">
+            <Link 
+              to={`/user/${user.username}/games`} 
+              className="px-6 py-2.5 rounded-full border border-hairline text-ink-muted font-bold text-sm hover:text-white transition-colors"
+            >
+              View all activity
+            </Link>
           </div>
         )}
       </div>
