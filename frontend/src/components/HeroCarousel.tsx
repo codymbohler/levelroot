@@ -43,11 +43,11 @@ export default function HeroCarousel() {
       <div className="absolute inset-0 bg-gradient-to-r from-canvas/80 via-transparent to-canvas/80" />
 
       {/* Content */}
-      <div className="relative h-full flex items-end p-8 pb-12 gap-6 max-w-4xl">
+      <div className="relative h-full flex items-end p-8 pb-4 gap-6 max-w-4xl">
         {/* Poster */}
         <Link 
           to={`/games/${game.slug}`} 
-          className="w-32 shrink-0 rounded-md overflow-hidden shadow-2xl block hover:scale-105 transition-transform duration-300 aspect-[3/4]"
+          className="w-28 shrink-0 rounded-md overflow-hidden shadow-2xl block hover:scale-105 transition-transform duration-300 aspect-[3/4]"
         >
           {game.cover ? (
             <img src={game.cover} alt={game.title} className="w-full h-full object-cover" />
@@ -57,7 +57,7 @@ export default function HeroCarousel() {
         </Link>
 
         {/* Text */}
-        <div className="pb-1">
+        <div className="pb-0">
           <p className="text-accent-green text-xs font-bold tracking-wider uppercase mb-2">
             Featured Game
           </p>
