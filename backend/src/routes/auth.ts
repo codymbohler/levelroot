@@ -34,7 +34,7 @@ router.post('/api/auth/register', async (req, res) => {
     const result = await pool.query(
       `INSERT INTO users (id, email, username, password)
        VALUES ($1, $2, $3, $4)
-       RETURNING id, email, username, created_at`,
+       RETURNING id, email, username, display_name, bio, avatar, banner_image, is_admin, created_at`,
       [id, email, username, passwordHash]
     );
 
@@ -57,7 +57,7 @@ router.post('/api/auth/login', async (req, res) => {
     }
 
     const result = await pool.query(
-      'SELECT id, email, username, password, created_at FROM users WHERE email = $1 LIMIT 1',
+      'SELECT id, email, username, password, display_name, bio, avatar, banner_image, is_admin, created_at FROM users WHERE email = $1 LIMIT 1',
       [email]
     );
 
@@ -80,6 +80,11 @@ router.post('/api/auth/login', async (req, res) => {
         id: user.id,
         email: user.email,
         username: user.username,
+        display_name: user.display_name,
+        bio: user.bio,
+        avatar: user.avatar,
+        banner_image: user.banner_image,
+        is_admin: user.is_admin,
         created_at: user.created_at,
       },
       token,
