@@ -180,20 +180,50 @@ function GamePage() {
               {game.developers && game.developers.length > 0 && (
                 <div>
                   <h3 className="text-ink-muted mb-1 uppercase tracking-wider text-xs font-bold">Developer</h3>
-                  <p className="text-ink font-medium">{game.developers.join(', ')}</p>
+                  <div className="flex flex-col gap-1">
+                    {game.developers.map((dev) => (
+                      <Link 
+                        key={dev} 
+                        to={`/developer/${encodeURIComponent(dev)}`}
+                        className="text-ink font-medium hover:text-accent-green transition-colors"
+                      >
+                        {dev}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
+              
               {game.publishers && game.publishers.length > 0 && (
                 <div>
                   <h3 className="text-ink-muted mb-1 uppercase tracking-wider text-xs font-bold">Publisher</h3>
-                  <p className="text-ink font-medium">{game.publishers.join(', ')}</p>
+                  <div className="flex flex-col gap-1">
+                    {game.publishers.map((pub) => (
+                      <Link 
+                        key={pub} 
+                        to={`/publisher/${encodeURIComponent(pub)}`}
+                        className="text-ink font-medium hover:text-accent-green transition-colors"
+                      >
+                        {pub}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
+
               {game.genres && game.genres.length > 0 && (
                 <div className="col-span-2 mt-2">
                   <h3 className="text-ink-muted mb-2 uppercase tracking-wider text-xs font-bold">Genres</h3>
                   <div className="flex flex-wrap gap-2">
-                    {game.genres.map(g => <span key={g} className="px-2 py-1 bg-surface border border-hairline rounded-md text-xs text-ink-muted">{g}</span>)}
+                    {game.genres.map(g => (
+                      <Link 
+                        key={g} 
+                        to={`/genre/${encodeURIComponent(g)}`}
+                        className="px-2 py-1 bg-surface border border-hairline rounded-md text-xs text-ink-muted hover:text-accent-green hover:border-accent-green transition-colors"
+                      >
+                        {g}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               )}

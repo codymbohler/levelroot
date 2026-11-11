@@ -30,7 +30,7 @@ export default function HeroCarousel() {
     || game.cover;
 
   return (
-    <div className="relative w-full h-[320px] overflow-hidden border-b border-hairline bg-canvas">
+    <div className="relative w-full h-[320px] overflow-hidden bg-canvas">
       
       {/* Sharp Backdrop Image */}
       <div
@@ -38,9 +38,9 @@ export default function HeroCarousel() {
         style={{ backgroundImage: `url(${bannerImage})` }}
       />
       
-      {/* Fades: Bottom fade for text, side fades for the content box */}
-      <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/60 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-canvas/80 via-transparent to-canvas/80" />
+      {/* Fades */}
+      <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-canvas/70 via-transparent to-canvas/70" />
 
       {/* Content */}
       <div className="relative h-full flex items-end p-8 pb-4 gap-6 max-w-4xl">

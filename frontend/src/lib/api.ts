@@ -32,13 +32,18 @@ export async function fetchGames(
   limit = 20,
   offset = 0,
   query = '',
-  sort = 'rating_count'
+  sort = 'rating_count',
+  filters?: { developer?: string; publisher?: string; genre?: string }
 ): Promise<Game[]> {
   const url = new URL(`${API_BASE}/api/games`);
   url.searchParams.set('limit', String(limit));
   url.searchParams.set('offset', String(offset));
   if (query.trim()) url.searchParams.set('q', query.trim());
   if (sort) url.searchParams.set('sort', sort);
+  
+  if (filters?.developer) url.searchParams.set('developer', filters.developer);
+  if (filters?.publisher) url.searchParams.set('publisher', filters.publisher);
+  if (filters?.genre) url.searchParams.set('genre', filters.genre);
 
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error(`Failed to fetch games: ${res.status}`);

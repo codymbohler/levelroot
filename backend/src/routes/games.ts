@@ -9,41 +9,57 @@ router.get('/api/games', async (req, res) => {
     const offset = parseInt(String(req.query.offset || '0'), 10) || 0;
     const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
     const sort = typeof req.query.sort === 'string' ? req.query.sort : 'rating_count';
+    
+    // Filtering logic
+    const developer = typeof req.query.developer === 'string' ? req.query.developer : null;
+    const publisher = typeof req.query.publisher === 'string' ? req.query.publisher : null;
+    const genre = typeof req.query.genre === 'string' ? req.query.genre : null;
 
-    // Safely map the sort param to SQL so we don't open ourselves up to SQL injection
-    let orderBy = 'rating_count DESC, title ASC'; // default
+    let orderBy = 'rating_count DESC, title ASC';
     if (sort === 'title') orderBy = 'title ASC';
     else if (sort === 'release_date') orderBy = 'release_date DESC NULLS LAST';
     else if (sort === 'average_rating') orderBy = 'average_rating DESC NULLS LAST, rating_count DESC';
 
-    let result;
-    let countResult;
+    let whereClauses = [];
+    let values: any[] = [];
+    let paramIndex = 1;
 
     if (q) {
-      const pattern = `%${q}%`;
-      result = await pool.query(
-        `SELECT id, slug, title, cover, release_date, average_rating, rating_count
-         FROM games
-         WHERE title ILIKE $1
-         ORDER BY ${orderBy}
-         LIMIT $2 OFFSET $3`,
-        [pattern, limit, offset]
-      );
-      countResult = await pool.query(
-        'SELECT COUNT(*)::int AS total FROM games WHERE title ILIKE $1',
-        [pattern]
-      );
-    } else {
-      result = await pool.query(
-        `SELECT id, slug, title, cover, release_date, average_rating, rating_count
-         FROM games
-         ORDER BY ${orderBy}
-         LIMIT $1 OFFSET $2`,
-        [limit, offset]
-      );
-      countResult = await pool.query('SELECT COUNT(*)::int AS total FROM games');
+      whereClauses.push(`title ILIKE $${paramIndex}`);
+      values.push(`%${q}%`);
+      paramIndex++;
+    }
+    if (developer) {
+      whereClauses.push(`$${paramIndex} = ANY(developers)`);
+      values.push(developer);
+      paramIndex++;
+    }
+    if (publisher) {
+      whereClauses.push(`$${paramIndex} = ANY(publishers)`);
+      values.push(publisher);
+      paramIndex++;
+    }
+    if (genre) {
+      whereClauses.push(`$${paramIndex} = ANY(genres)`);
+      values.push(genre);
+      paramIndex++;
     }
 
+    const whereString = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+    const result = await pool.query(
+      `SELECT id, slug, title, cover, release_date, average_rating, rating_count, cover_override
+       FROM games
+       ${whereString}
+       ORDER BY ${orderBy}
+       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+      [...values, limit, offset]
+    );
+
+    const countResult = await pool.query(
+      `SELECT COUNT(*)::int AS total FROM games ${whereString}`,
+      values
+    );
     const total = countResult.rows[0].total;
 
     return res.json({

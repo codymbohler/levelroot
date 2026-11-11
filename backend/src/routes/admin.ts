@@ -21,7 +21,7 @@ async function requireAdmin(req: AuthedRequest, res: any, next: any) {
 router.put('/api/admin/games/:id', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
   try {
     const { id } = req.params;
-    const { title, description, developers, publishers, genres, bannerImage, coverOverride } = req.body;
+    const { title, description, developers, publishers, genres, bannerImage, coverOverride, trailerUrl } = req.body; // ADD trailerUrl
 
     const result = await pool.query(
       `UPDATE games SET
@@ -32,11 +32,23 @@ router.put('/api/admin/games/:id', requireAuth, requireAdmin, async (req: Authed
          genres = $5,
          banner_image = $6,
          cover_override = $7,
+         trailer_url = $8, -- ADD THIS
          updated_at = NOW()
-       WHERE id = $8
+       WHERE id = $9
        RETURNING *`,
-      [title, description, developers, publishers, genres, bannerImage, coverOverride, id]
+      [
+        title,
+        description,
+        developers,
+        publishers,
+        genres,
+        bannerImage,
+        coverOverride,
+        trailerUrl,
+        id
+      ]
     );
+
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Game not found' });

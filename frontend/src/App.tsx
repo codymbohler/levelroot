@@ -15,6 +15,7 @@ import UserReviewsPage from './pages/UserReviewsPage';
 import WishlistPage from './pages/WishlistPage';
 import SettingsPage from './pages/SettingsPage';
 import AdminPage from './pages/AdminPage';
+import FilterPage from './pages/FilterPage';
 
 function Header() {
   const { user, loading, logout } = useAuth();
@@ -77,8 +78,8 @@ function Header() {
               <Link to={`/user/${user.username}/wishlist`} className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Want to Play</Link>
 			  <Link to="/settings" className="block px-4 py-2 hover:bg-surface-hover text-ink text-sm">Settings</Link>
               <div className="h-px bg-hairline my-1" />
-			  {user?.is_admin && (
-				<Link to="/admin" className="block px-4 py-2 hover:bg-surface-hover text-ps-blue text-sm font-bold">Admin Panel</Link>
+				{user?.is_admin && (
+				<Link to="/admin" className="block px-4 py-2 hover:bg-surface-hover text-accent-green text-sm font-bold">Admin Panel</Link>
 				)}
               <button onClick={() => { logout(); navigate('/'); }} className="w-full text-left px-4 py-2 hover:bg-surface-hover text-red-400 text-sm">Sign Out</button>
             </div>
@@ -149,6 +150,9 @@ function App() {
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/search" element={<SearchPage />} />
 				<Route path="/admin" element={<AdminPage />} />
+				<Route path="/developer/:value" element={<FilterPage type="developer" />} />
+				<Route path="/publisher/:value" element={<FilterPage type="publisher" />} />
+				<Route path="/genre/:value" element={<FilterPage type="genre" />} />
               </Routes>
             </main>
           </div>

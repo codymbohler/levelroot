@@ -15,15 +15,18 @@ export default function AdminGameModal({ game, onClose, onSaved }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setFormData({
-      title: game.title || '',
-      description: game.description || '',
-      developers: game.developers?.join(', ') || '',
-      publishers: game.publishers?.join(', ') || '',
-      genres: game.genres?.join(', ') || '',
-      banner_image: game.banner_image || '',
-      cover_override: game.cover_override || '',
-    });
+    if (game) {
+      setFormData({
+        title: game.title || '',
+        description: game.description || '',
+        developers: game.developers?.join(', ') || '',
+        publishers: game.publishers?.join(', ') || '',
+        genres: game.genres?.join(', ') || '',
+        banner_image: game.banner_image || '',
+        cover_override: game.cover_override || '',
+        trailer_url: game.trailer_url || '', // <-- ADD THIS
+      });
+    }
   }, [game]);
 
   async function handleSave(e: React.FormEvent) {
@@ -41,6 +44,7 @@ export default function AdminGameModal({ game, onClose, onSaved }: Props) {
         genres: formData.genres.split(',').map((s: string) => s.trim()).filter(Boolean),
         bannerImage: formData.banner_image,
         coverOverride: formData.cover_override,
+        trailerUrl: formData.trailer_url, // <-- ADD THIS
       });
       onSaved(updated);
     } catch (err: any) {
@@ -81,6 +85,20 @@ export default function AdminGameModal({ game, onClose, onSaved }: Props) {
               <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1 font-bold">Banner URL (Screenshot)</label>
               <input type="text" value={formData.banner_image} onChange={(e) => setFormData({ ...formData, banner_image: e.target.value })} placeholder="Paste custom banner URL" className="w-full px-3 py-2 bg-canvas border border-hairline rounded-md text-ink text-sm focus:outline-none focus:border-accent-green" />
             </div>
+          </div>
+		  
+		  {/* Trailer URL */}
+          <div>
+            <label className="block text-xs uppercase tracking-wider text-ink-muted mb-1 font-bold">
+              YouTube Trailer URL
+            </label>
+            <input 
+              type="text" 
+              value={formData.trailer_url} 
+              onChange={(e) => setFormData({ ...formData, trailer_url: e.target.value })} 
+              placeholder="https://www.youtube.com/watch?v=..." 
+              className="w-full px-3 py-2 bg-canvas border border-hairline rounded-md text-ink text-sm focus:outline-none focus:border-accent-green" 
+            />
           </div>
 
           {/* Developers & Publishers */}
