@@ -23,8 +23,9 @@ function HomePage() {
 
   return (
     <main>
-      <HeroCarousel />
-
+      <div className="-mt-[88px]">
+        <HeroCarousel />
+      </div>
       <div className="px-8 py-8">
         <div className="flex items-center gap-6 mb-6">
           <h2 className="text-2xl font-display font-medium">Activity</h2>

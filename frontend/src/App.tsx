@@ -23,7 +23,10 @@ function Header() {
   const [search, setSearch] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const isImmersivePage = (location.pathname.startsWith('/games/') && location.pathname !== '/games') || location.pathname.startsWith('/user/');
+  const isImmersivePage = 
+  location.pathname === '/' || 
+  (location.pathname.startsWith('/games/') && location.pathname !== '/games') || 
+  location.pathname.startsWith('/user/');
 
   useEffect(() => {
     if (isSearchOpen) searchInputRef.current?.focus();
@@ -83,7 +86,7 @@ function Header() {
         ) : (
           <>
             <Link to="/login" className="text-white/80 hover:text-white transition-colors drop-shadow-sm">Sign in</Link>
-            <Link to="/register" className="px-5 py-2 rounded-full bg-ps-blue text-white font-semibold hover:bg-ps-blue-hover transition-colors">Join</Link>
+            <Link to="/register" className="px-5 py-2 rounded-full bg-accent-green text-white font-semibold hover:bg-accent-green-hover transition-colors">Join</Link>
           </>
         )}
 

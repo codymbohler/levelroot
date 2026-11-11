@@ -92,7 +92,7 @@ function UserPage() {
       </div>
 
       {/* PROFILE HEADER OVERLAY */}
-      <div className="relative z-20 px-8 max-w-5xl mx-auto -mt-32">
+      <div className="relative z-20 px-8 max-w-5xl mx-auto -mt-36">
         <div className="flex items-end justify-between gap-6">
           
           {/* Avatar and Info */}
