@@ -48,7 +48,7 @@ router.get('/api/games', async (req, res) => {
     const whereString = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
     const result = await pool.query(
-      `SELECT id, slug, title, cover, release_date, average_rating, rating_count, cover_override
+      `SELECT id, slug, title, COALESCE(cover_override, cover) AS cover, release_date, average_rating, rating_count
        FROM games
        ${whereString}
        ORDER BY ${orderBy}
@@ -75,7 +75,7 @@ router.get('/api/games', async (req, res) => {
 router.get('/api/games/featured', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, slug, title, cover, release_date, average_rating, rating_count, screenshots, banner_image
+      `SELECT id, slug, title, COALESCE(cover_override, cover) AS cover, release_date, average_rating, rating_count, screenshots, banner_image
        FROM games
        WHERE cover IS NOT NULL AND rating_count > 500
        ORDER BY RANDOM()
@@ -93,7 +93,7 @@ router.get('/api/games/:slug', async (req, res) => {
     const { slug } = req.params;
 
     const result = await pool.query(
-      `SELECT id, rawg_id, slug, title, cover, release_date, description, average_rating, rating_count, genres, developers, publishers, cover_override, screenshots, banner_image, trailer_url
+      `SELECT id, rawg_id, slug, title, cover, cover_override, release_date, description, average_rating, rating_count, genres, developers, publishers, screenshots, banner_image, trailer_url
        FROM games
        WHERE slug = $1
        LIMIT 1`,

@@ -34,7 +34,11 @@ router.get('/api/wishlist/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const result = await pool.query(
-      `SELECT g.* FROM wishlist w JOIN games g ON g.id = w.game_id WHERE w.user_id = $1 ORDER BY w.created_at DESC`,
+      `SELECT g.*, COALESCE(g.cover_override, g.cover) AS cover 
+       FROM wishlist w 
+       JOIN games g ON g.id = w.game_id 
+       WHERE w.user_id = $1 
+       ORDER BY w.created_at DESC`,
       [userId]
     );
     return res.json({ games: result.rows });

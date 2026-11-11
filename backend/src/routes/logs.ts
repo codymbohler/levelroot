@@ -17,7 +17,6 @@ router.post('/api/logs/update', requireAuth, async (req: AuthedRequest, res) => 
       [req.userId, gameId]
     );
 
-    // 1. If the user is turning OFF "Played", delete the log entirely
     if (isPlayed === false) {
       if (existing.rowCount && existing.rowCount > 0) {
         await pool.query('DELETE FROM logs WHERE id = $1', [existing.rows[0].id]);
@@ -25,7 +24,6 @@ router.post('/api/logs/update', requireAuth, async (req: AuthedRequest, res) => 
       return res.json({ log: null });
     }
 
-    // 2. If they are turning ON "Beat", force "Played" to be true
     const forcePlayed = isPlayed || isBeat ? true : undefined;
 
     let result;
@@ -41,7 +39,6 @@ router.post('/api/logs/update', requireAuth, async (req: AuthedRequest, res) => 
         [newRating, newBeat, newPlayed, log.id]
       );
     } else {
-      // 3. If no log exists, create one
       result = await pool.query(
         `INSERT INTO logs (id, user_id, game_id, rating, is_beat, is_played)
          VALUES (gen_random_uuid()::text, $1, $2, $3, $4, $5) RETURNING *`,
@@ -116,7 +113,10 @@ router.get('/api/logs/user/:userId', async (req, res) => {
     const result = await pool.query(
       `SELECT
          l.*, 
-         g.slug AS game_slug, g.title AS game_title, g.cover AS game_cover, g.release_date AS game_release_date
+         g.slug AS game_slug, 
+         g.title AS game_title, 
+         COALESCE(g.cover_override, g.cover) AS game_cover, 
+         g.release_date AS game_release_date
        FROM logs l
        JOIN games g ON g.id = l.game_id
        WHERE l.user_id = $1
@@ -154,7 +154,8 @@ router.get('/api/logs/recent', async (req, res) => {
         l.id, l.is_played, l.is_beat, l.rating, l.review, l.quick_take, l.played_on, l.created_at,
         u.id AS user_id, u.username, u.display_name, u.avatar,
         g.id AS game_id, g.slug AS game_slug, g.title AS game_title,
-        g.cover AS game_cover, g.release_date AS game_release_date
+        COALESCE(g.cover_override, g.cover) AS game_cover, 
+        g.release_date AS game_release_date
       FROM logs l
       JOIN users u ON u.id = l.user_id
       JOIN games g ON g.id = l.game_id
