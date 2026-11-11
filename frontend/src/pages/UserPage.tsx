@@ -179,9 +179,9 @@ function UserPage() {
                 className="rounded-md overflow-hidden bg-surface border border-hairline group transition-transform hover:-translate-y-1 block"
               >
                 <div className="aspect-[2/3] overflow-hidden bg-charcoal">
-                  {fav.cover ? (
+                  {(fav.cover_override || fav.cover) ? (
                     <img
-                      src={fav.cover}
+                      src={fav.cover_override || fav.cover || ''}
                       alt={fav.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"

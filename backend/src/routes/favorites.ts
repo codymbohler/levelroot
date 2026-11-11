@@ -12,7 +12,7 @@ router.get('/api/favorites/user/:userId', async (req, res) => {
     const result = await pool.query(
       `SELECT
          f.position,
-         g.id, g.slug, g.title, g.cover, g.release_date, g.average_rating, g.rating_count
+         g.id, g.slug, g.title, COALESCE(g.cover_override, g.cover) AS cover, g.release_date, g.average_rating, g.rating_count
        FROM favorites f
        JOIN games g ON g.id = f.game_id
        WHERE f.user_id = $1

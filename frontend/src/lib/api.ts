@@ -153,6 +153,7 @@ export type Favorite = {
   slug: string;
   title: string;
   cover: string | null;
+  cover_override?: string | null;
   release_date: string | null;
   average_rating: number | null;
   rating_count: number;

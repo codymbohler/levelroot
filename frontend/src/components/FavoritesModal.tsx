@@ -170,9 +170,9 @@ function FavoritesModal({ currentFavorites, onClose, onSaved }: Props) {
                           : 'border-transparent hover:border-hairline'
                       } ${isFull ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
-                      {game.cover ? (
+                      {(game.cover_override || game.cover) ? (
                         <img
-                          src={game.cover}
+                          src={game.cover_override || game.cover || ''}
                           alt={game.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
