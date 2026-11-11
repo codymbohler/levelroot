@@ -23,7 +23,7 @@ function Header() {
   const [search, setSearch] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const isGamePage = location.pathname.startsWith('/games/') && location.pathname !== '/games';
+  const isImmersivePage = (location.pathname.startsWith('/games/') && location.pathname !== '/games') || location.pathname.startsWith('/user/');
 
   useEffect(() => {
     if (isSearchOpen) searchInputRef.current?.focus();
@@ -41,7 +41,7 @@ function Header() {
   return (
     <header 
       className={`px-8 py-4 flex items-center justify-between gap-6 sticky top-0 z-50 transition-colors duration-300 ${
-        isGamePage 
+        isImmersivePage 
           ? 'bg-gradient-to-b from-black/80 to-transparent border-transparent drop-shadow-md' 
           : 'bg-canvas/90 backdrop-blur-md border-b border-hairline'
       }`}

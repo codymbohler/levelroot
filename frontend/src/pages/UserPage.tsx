@@ -7,12 +7,9 @@ import {
   fetchFollowStatus,
   followUser,
   unfollowUser,
-  deleteLog,
 } from '../lib/api';
 import type { UserProfile, UserLog, Favorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import FavoritesModal from '../components/FavoritesModal';
-import LogModal from '../components/LogModal';
 import ReviewListCard from '../components/ReviewListCard';
 
 function UserPage() {
@@ -23,11 +20,8 @@ function UserPage() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showFavModal, setShowFavModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followBusy, setFollowBusy] = useState(false);
-  const [editingLog, setEditingLog] = useState<UserLog | null>(null);
-  const [deletingLogId, setDeletingLogId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!username) return;
@@ -72,32 +66,15 @@ function UserPage() {
     }
   }
 
-  async function handleDeleteLog(logId: string) {
-    if (!token) return;
-    if (!confirm('Delete this log? This cannot be undone.')) return;
-    setDeletingLogId(logId);
-    try {
-      await deleteLog(token, logId);
-      setLogs(logs.filter((l) => l.id !== logId));
-    } catch (err) {
-      console.error('delete log failed:', err);
-    } finally {
-      setDeletingLogId(null);
-    }
-  }
-
   if (loading) return <main className="px-8 py-12 text-ink-muted">Loading…</main>;
   if (error || !user) return <main className="px-8 py-12"><p className="text-red-400">{error || 'User not found'}</p></main>;
 
-  const memberSince = new Date(user.created_at).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-  });
-
+  // WE DEFINE isOwnProfile HERE
   const isOwnProfile = me?.id === user.id;
-
-  // Pick the banner: User's custom banner -> First favorite game cover -> null
-  const bannerImage = user.banner_image || (favorites.length > 0 ? favorites[0].cover : null);
+  
+  // Use the live 'me' object if viewing our own profile, otherwise use fetched 'user'
+  const displayUser = isOwnProfile && me ? { ...user, ...me } : user;
+  const bannerImage = displayUser.banner_image || (favorites.length > 0 ? favorites[0].cover : null);
 
   return (
     <main className="pb-24">
@@ -106,8 +83,7 @@ function UserPage() {
         {bannerImage ? (
           <>
             <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${bannerImage})` }} />
-            {/* Fades */}
-            <div className="absolute inset-0 bg-gradient-to-t from-canvas via-canvas/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-canvas via-transparent/0 to-60%" />
             <div className="absolute inset-0 bg-gradient-to-r from-canvas/70 via-transparent to-canvas/70" />
           </>
         ) : (
@@ -152,7 +128,7 @@ function UserPage() {
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Follow Button (Only shows if viewing someone else's profile) */}
           <div className="pb-2">
             {me && me.id !== user.id && (
               <button
@@ -167,15 +143,6 @@ function UserPage() {
                 {followBusy ? '…' : isFollowing ? 'Following' : 'Follow'}
               </button>
             )}
-
-            {isOwnProfile && (
-              <Link
-                to="/settings"
-                className="px-7 py-2.5 rounded-full border border-hairline bg-black/50 backdrop-blur text-ink-muted font-bold text-sm tracking-wide hover:text-ink transition-colors inline-block"
-              >
-                Edit profile
-              </Link>
-            )}
           </div>
         </div>
 
@@ -188,16 +155,16 @@ function UserPage() {
       {/* 5 Favorites band */}
       <div className="px-8 pt-12 pb-8 max-w-5xl mx-auto border-b border-hairline">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-display font-medium">
-            Favorites {favorites.length > 0 && <span className="text-ink-muted">({favorites.length}/5)</span>}
-          </h2>
+          <h2 className="text-2xl font-display font-medium">Favorites</h2>
+          
+          {/* Edit Profile Button moved here */}
           {isOwnProfile && (
-            <button
-              onClick={() => setShowFavModal(true)}
+            <Link
+              to="/settings"
               className="px-5 py-2 rounded-full bg-surface border border-hairline text-white text-sm font-bold tracking-wide hover:bg-surface-hover transition-colors"
             >
-              {favorites.length === 0 ? 'Pick favorites' : 'Edit favorites'}
-            </button>
+              Edit Profile
+            </Link>
           )}
         </div>
 
@@ -261,17 +228,6 @@ function UserPage() {
           </div>
         )}
       </div>
-
-      {showFavModal && (
-        <FavoritesModal
-          currentFavorites={favorites}
-          onClose={() => setShowFavModal(false)}
-          onSaved={(newFavorites) => {
-            setFavorites(newFavorites);
-            setShowFavModal(false);
-          }}
-        />
-      )}
     </main>
   );
 }

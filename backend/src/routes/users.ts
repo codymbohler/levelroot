@@ -31,7 +31,7 @@ router.put('/api/users/me', requireAuth, async (req: AuthedRequest, res) => {
          display_name = $1,
          bio = $2,
          avatar = $3,
-		 banner_image = $4,
+         banner_image = $4,
          updated_at = NOW()
        WHERE id = $5
        RETURNING id, username, display_name, bio, avatar, banner_image, created_at,
@@ -41,7 +41,7 @@ router.put('/api/users/me', requireAuth, async (req: AuthedRequest, res) => {
         displayName?.trim() || null,
         bio?.trim() || null,
         avatar?.trim() || null,
-		bannerImage?.trim() || null,
+        bannerImage?.trim() || null,
         req.userId,
       ]
     );

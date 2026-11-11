@@ -3,6 +3,7 @@ import { useAuth } from '../lib/auth';
 import { updateProfile, fetchFavorites } from '../lib/api';
 import type { Favorite } from '../lib/api';
 import { Link, useNavigate } from 'react-router-dom';
+import FavoritesModal from '../components/FavoritesModal';
 
 export default function SettingsPage() {
   const { user, token, refreshUser } = useAuth();
@@ -13,7 +14,7 @@ export default function SettingsPage() {
   const [avatar, setAvatar] = useState('');
   const [bannerImage, setBannerImage] = useState('');
   const [favorites, setFavorites] = useState<Favorite[]>([]);
-  
+  const [showFavModal, setShowFavModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,9 +71,19 @@ export default function SettingsPage() {
         
         {/* Banner Selection */}
         <div>
-          <label className="block text-xs uppercase tracking-wider text-ink-muted mb-2 font-bold">
-            Profile Banner
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-xs uppercase tracking-wider text-ink-muted font-bold">
+              Profile Banner
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowFavModal(true)}
+              className="text-xs text-accent-green hover:underline font-bold"
+            >
+              Edit Favorites
+            </button>
+          </div>
+          
           {favorites.length > 0 ? (
             <div>
               <p className="text-sm text-ink-muted mb-3">
@@ -83,7 +94,7 @@ export default function SettingsPage() {
                   <button
                     key={fav.id}
                     type="button"
-                    onClick={() => setBannerImage(fav.cover || '')} // Note: We'll use the cover for now
+                    onClick={() => setBannerImage(fav.cover || '')}
                     className={`relative aspect-[2/3] rounded-md overflow-hidden border-2 transition-all ${
                       bannerImage === fav.cover ? 'border-accent-green ring-2 ring-accent-green/30' : 'border-transparent hover:border-white/20'
                     }`}
@@ -109,7 +120,7 @@ export default function SettingsPage() {
             </div>
           ) : (
             <p className="text-sm text-ink-muted">
-              You need to <Link to="/games" className="text-accent-green hover:underline">pick 5 favorite games</Link> to unlock custom banners.
+              You need to pick 5 favorite games to unlock custom banners.
             </p>
           )}
         </div>
@@ -169,6 +180,17 @@ export default function SettingsPage() {
           </button>
         </div>
       </form>
+
+      {showFavModal && user && (
+        <FavoritesModal
+          currentFavorites={favorites}
+          onClose={() => setShowFavModal(false)}
+          onSaved={(newFavorites) => {
+            setFavorites(newFavorites);
+            setShowFavModal(false);
+          }}
+        />
+      )}
     </main>
   );
 }
